@@ -11,7 +11,7 @@ Documentation is available at https://docs.rs/mime-multipart
 
 ## Compatibility
 
-* **Version 1**
+* **Version 0.8**
   * Use Rust version 2021
   * Update hyper from 0.10 to 0.11
   * Updates mime crate to version 0.3 (up-to-date at time of writing, November 2024)

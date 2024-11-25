@@ -5,11 +5,16 @@
 
 Rust library for MIME multipart parsing, construction, and streaming
 
-This crate predates rust async support. It will remain pre-async to support
-codebases which aren't intending to be rewritten under the async methodology.
-That means we will remain on hyper 0.10.
+This is a fork of https://github.com/mikedilger/mime-multipart with support for newer hyper versions.
 
 Documentation is available at https://docs.rs/mime-multipart
+
+## Compatibility
+
+* **Version 1**
+  * Use Rust version 2021
+  * Update hyper from 0.10 to 0.11
+  * Updates mime crate to version 0.3 (up-to-date at time of writing, November 2024)
 
 ## Features
 
@@ -28,12 +33,11 @@ further.
 
 Licensed under either of
 
- * Apache License, Version 2.0
-   ([LICENSE-APACHE](LICENSE-APACHE)
-    or http://www.apache.org/licenses/LICENSE-2.0)
-
- * MIT license
-   ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+* Apache License, Version 2.0
+  ([LICENSE-APACHE](LICENSE-APACHE)
+  or http://www.apache.org/licenses/LICENSE-2.0)
+* MIT license
+  ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
 
 at your option.
 

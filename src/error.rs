@@ -69,17 +69,21 @@ impl From<FromUtf8Error> for Error {
 impl Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Error::Httparse(ref e) =>
-                format!("Httparse: {:?}", e).fmt(f),
-            Error::Io(ref e) =>
-                format!("Io: {}", e).fmt(f),
-            Error::Hyper(ref e) =>
-                format!("Hyper: {}", e).fmt(f),
-            Error::Utf8(ref e) =>
-                format!("Utf8: {}", e).fmt(f),
-            Error::Decoding(ref e) =>
-                format!("Decoding: {}", e).fmt(f),
-            _ => format!("{}", self).fmt(f),
+            Error::Httparse(ref e) => format!("Httparse: {:?}", e).fmt(f),
+            Error::Io(ref e) => format!("Io: {}", e).fmt(f),
+            Error::Hyper(ref e) => format!("Hyper: {}", e).fmt(f),
+            Error::Utf8(ref e) => format!("Utf8: {}", e).fmt(f),
+            Error::Decoding(ref e) => format!("Decoding: {}", e).fmt(f),
+            Error::NoRequestContentType => "NoRequestContentType".to_string().fmt(f),
+            Error::NotMultipart => "NotMultipart".to_string().fmt(f),
+            Error::BoundaryNotSpecified => "BoundaryNotSpecified".to_string().fmt(f),
+            Error::PartialHeaders => "PartialHeaders".to_string().fmt(f),
+            Error::EofBeforeFirstBoundary => "EofBeforeFirstBoundary".to_string().fmt(f),
+            Error::NoCrLfAfterBoundary => "NoCrLfAfterBoundary".to_string().fmt(f),
+            Error::EofInPartHeaders => "EofInPartHeaders".to_string().fmt(f),
+            Error::EofInFile => "EofInFile".to_string().fmt(f),
+            Error::EofInPart => "EofInPart".to_string().fmt(f),
+            Error::EofInMainHeaders => "EofInMainHeaders".to_string().fmt(f),
         }
     }
 }
@@ -95,29 +99,31 @@ impl fmt::Debug for Error {
 }
 
 impl StdError for Error {
-    fn description(&self) -> &str{
+    fn description(&self) -> &str {
         match *self {
             Error::NoRequestContentType => "The Hyper request did not have a Content-Type header.",
-            Error::NotMultipart =>
-                "The Hyper request Content-Type top-level Mime was not multipart.",
-            Error::BoundaryNotSpecified =>
-                "The Content-Type header failed to specify a boundary token.",
-            Error::PartialHeaders =>
-                "A multipart section contained only partial headers.",
-            Error::EofInMainHeaders =>
-                "The request headers ended pre-maturely.",
-            Error::EofBeforeFirstBoundary =>
-                "The request body ended prior to reaching the expected starting boundary.",
-            Error::NoCrLfAfterBoundary =>
-                "Missing CRLF after boundary.",
-            Error::EofInPartHeaders =>
-                "The request body ended prematurely while parsing headers of a multipart part.",
-            Error::EofInFile =>
-                "The request body ended prematurely while streaming a file part.",
-            Error::EofInPart =>
-                "The request body ended prematurely while reading a multipart part.",
-            Error::Httparse(_) =>
-                "A parse error occurred while parsing the headers of a multipart section.",
+            Error::NotMultipart => {
+                "The Hyper request Content-Type top-level Mime was not multipart."
+            }
+            Error::BoundaryNotSpecified => {
+                "The Content-Type header failed to specify a boundary token."
+            }
+            Error::PartialHeaders => "A multipart section contained only partial headers.",
+            Error::EofInMainHeaders => "The request headers ended pre-maturely.",
+            Error::EofBeforeFirstBoundary => {
+                "The request body ended prior to reaching the expected starting boundary."
+            }
+            Error::NoCrLfAfterBoundary => "Missing CRLF after boundary.",
+            Error::EofInPartHeaders => {
+                "The request body ended prematurely while parsing headers of a multipart part."
+            }
+            Error::EofInFile => "The request body ended prematurely while streaming a file part.",
+            Error::EofInPart => {
+                "The request body ended prematurely while reading a multipart part."
+            }
+            Error::Httparse(_) => {
+                "A parse error occurred while parsing the headers of a multipart section."
+            }
             Error::Io(_) => "An I/O error occurred.",
             Error::Hyper(_) => "A Hyper error occurred.",
             Error::Utf8(_) => "A UTF-8 error occurred.",

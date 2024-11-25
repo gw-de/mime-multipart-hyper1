@@ -2,17 +2,17 @@
 name = "mime_multipart"
 version = "0.7.0-unstable"
 description = "MIME multipart parsing, construction, and streaming"
-authors = ["Mike Dilger <mike@optcomp.nz>"]
+authors = ["Mike Dilger <mike@optcomp.nz>", "Gunnar Westerling <gunnarwesterling@gmail.com>"]
 readme = "README.md"
-repository = "https://github.com/mikedilger/mime-multipart"
-documentation = "https://mikedilger.github.io/mime-multipart"
+repository = "https://github.com/gw-de/mime-multipart"
+documentation = "https://github.com/gw-de/mime-multipart"
 license = "MIT OR Apache-2.0"
 keywords = ["mime", "multipart", "mixed"]
-edition = "2018"
+edition = "2021"
 
 [dependencies]
-hyper = { version = "0.10", default-features = false }
-mime = "0.2"
+hyper = { version = "0.11", default-features = false }
+mime = "0.3"
 httparse = "1.3"
 textnonce = "1.0"
 log = "0.4"

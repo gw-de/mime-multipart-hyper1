@@ -5,7 +5,6 @@
 // http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-use std::borrow::Cow;
 use std::error::Error as StdError;
 use std::fmt::{self, Display};
 use std::io;
@@ -13,6 +12,7 @@ use std::string::FromUtf8Error;
 
 use httparse;
 use hyper;
+use hyper::header::ToStrError;
 
 /// An error type for the `mime-multipart` crate.
 pub enum Error {
@@ -30,6 +30,11 @@ pub enum Error {
     EofInPartHeaders,
     EofInFile,
     EofInPart,
+    HeaderMissing,
+    InvalidHeaderNameOrValue,
+    HeaderValueNotMime,
+    FilenameWithNonAsciiEncodingNotSupported,
+    ToStr(ToStrError),
     /// An HTTP parsing error from a multipart section.
     Httparse(httparse::Error),
     /// An I/O error.
@@ -38,8 +43,6 @@ pub enum Error {
     Hyper(hyper::Error),
     /// An error occurred during UTF-8 processing.
     Utf8(FromUtf8Error),
-    /// An error occurred during character decoding
-    Decoding(Cow<'static, str>),
 }
 
 impl From<io::Error> for Error {
@@ -73,7 +76,7 @@ impl Display for Error {
             Error::Io(ref e) => format!("Io: {}", e).fmt(f),
             Error::Hyper(ref e) => format!("Hyper: {}", e).fmt(f),
             Error::Utf8(ref e) => format!("Utf8: {}", e).fmt(f),
-            Error::Decoding(ref e) => format!("Decoding: {}", e).fmt(f),
+            Error::ToStr(ref e) => format!("ToStr: {}", e).fmt(f),
             Error::NoRequestContentType => "NoRequestContentType".to_string().fmt(f),
             Error::NotMultipart => "NotMultipart".to_string().fmt(f),
             Error::BoundaryNotSpecified => "BoundaryNotSpecified".to_string().fmt(f),
@@ -84,6 +87,12 @@ impl Display for Error {
             Error::EofInFile => "EofInFile".to_string().fmt(f),
             Error::EofInPart => "EofInPart".to_string().fmt(f),
             Error::EofInMainHeaders => "EofInMainHeaders".to_string().fmt(f),
+            Error::HeaderMissing => "HeaderMissing".to_string().fmt(f),
+            Error::InvalidHeaderNameOrValue => "InvalidHeaderNameOrValue".to_string().fmt(f),
+            Error::HeaderValueNotMime => "HeaderValueNotMime".to_string().fmt(f),
+            Error::FilenameWithNonAsciiEncodingNotSupported => {
+                "NonAsciiFilenameNotSupported".to_string().fmt(f)
+            }
         }
     }
 }
@@ -127,7 +136,13 @@ impl StdError for Error {
             Error::Io(_) => "An I/O error occurred.",
             Error::Hyper(_) => "A Hyper error occurred.",
             Error::Utf8(_) => "A UTF-8 error occurred.",
-            Error::Decoding(_) => "A decoding error occurred.",
+            Error::HeaderMissing => "The requested header could not be found in the HeaderMap",
+            Error::InvalidHeaderNameOrValue => "Parsing to HeaderName or HeaderValue failed",
+            Error::HeaderValueNotMime => "HeaderValue could not be parsed to Mime",
+            Error::ToStr(_) => "A ToStr error occurred.",
+            Error::FilenameWithNonAsciiEncodingNotSupported => {
+                "Non-ASCII filename parsing not supported"
+            }
         }
     }
 }

@@ -10,7 +10,7 @@ pub mod error;
 pub use error::Error;
 
 use buf_read_ext::BufReadExt;
-use hyper::header::{HeaderMap, HeaderName, HeaderValue};
+use http::header::{HeaderMap, HeaderName, HeaderValue};
 use mime::Mime;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Read, Write};
@@ -115,8 +115,8 @@ impl FilePart {
 impl Drop for FilePart {
     fn drop(&mut self) {
         if self.tempdir.is_some() {
-            let _ = ::std::fs::remove_file(&self.path);
-            let _ = ::std::fs::remove_dir(self.tempdir.as_ref().unwrap());
+            let _ = std::fs::remove_file(&self.path);
+            let _ = std::fs::remove_dir(self.tempdir.as_ref().unwrap());
         }
     }
 }
@@ -446,10 +446,10 @@ pub fn generate_boundary() -> Vec<u8> {
 
 // Convenience method, like write_all(), but returns the count of bytes written.
 trait WriteAllCount {
-    fn write_all_count(&mut self, buf: &[u8]) -> ::std::io::Result<usize>;
+    fn write_all_count(&mut self, buf: &[u8]) -> std::io::Result<usize>;
 }
 impl<T: Write> WriteAllCount for T {
-    fn write_all_count(&mut self, buf: &[u8]) -> ::std::io::Result<usize> {
+    fn write_all_count(&mut self, buf: &[u8]) -> std::io::Result<usize> {
         self.write_all(buf)?;
         Ok(buf.len())
     }

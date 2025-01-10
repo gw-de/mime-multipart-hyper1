@@ -17,6 +17,8 @@ Documentation is available at https://docs.rs/mime-multipart
   * Updates mime crate to version 0.3 (up-to-date at time of writing, November 2024)
 * **Version 0.9**
   * Update hyper to 0.14 (also compatible with hyper 0.12 and 0.13)
+* **Version 0.10**
+  * Replace hyper dependency with http crate. This makes this crate compatible with hyper 1.x
 
 ## Features
 

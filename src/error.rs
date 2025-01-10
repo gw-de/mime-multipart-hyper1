@@ -10,9 +10,9 @@ use std::fmt::{self, Display};
 use std::io;
 use std::string::FromUtf8Error;
 
+use http;
+use http::header::ToStrError;
 use httparse;
-use hyper;
-use hyper::header::ToStrError;
 
 /// An error type for the `mime-multipart` crate.
 pub enum Error {
@@ -40,7 +40,7 @@ pub enum Error {
     /// An I/O error.
     Io(io::Error),
     /// An error was returned from Hyper.
-    Hyper(hyper::Error),
+    Http(http::Error),
     /// An error occurred during UTF-8 processing.
     Utf8(FromUtf8Error),
 }
@@ -57,9 +57,9 @@ impl From<httparse::Error> for Error {
     }
 }
 
-impl From<hyper::Error> for Error {
-    fn from(err: hyper::Error) -> Error {
-        Error::Hyper(err)
+impl From<http::Error> for Error {
+    fn from(err: http::Error) -> Error {
+        Error::Http(err)
     }
 }
 
@@ -74,7 +74,7 @@ impl Display for Error {
         match *self {
             Error::Httparse(ref e) => format!("Httparse: {:?}", e).fmt(f),
             Error::Io(ref e) => format!("Io: {}", e).fmt(f),
-            Error::Hyper(ref e) => format!("Hyper: {}", e).fmt(f),
+            Error::Http(ref e) => format!("Http: {}", e).fmt(f),
             Error::Utf8(ref e) => format!("Utf8: {}", e).fmt(f),
             Error::ToStr(ref e) => format!("ToStr: {}", e).fmt(f),
             Error::NoRequestContentType => "NoRequestContentType".to_string().fmt(f),
@@ -134,7 +134,7 @@ impl StdError for Error {
                 "A parse error occurred while parsing the headers of a multipart section."
             }
             Error::Io(_) => "An I/O error occurred.",
-            Error::Hyper(_) => "A Hyper error occurred.",
+            Error::Http(_) => "A Http error occurred.",
             Error::Utf8(_) => "A UTF-8 error occurred.",
             Error::HeaderMissing => "The requested header could not be found in the HeaderMap",
             Error::InvalidHeaderNameOrValue => "Parsing to HeaderName or HeaderValue failed",

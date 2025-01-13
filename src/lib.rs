@@ -7,6 +7,9 @@
 
 pub mod error;
 
+#[cfg(test)]
+mod tests;
+
 pub use error::Error;
 
 use buf_read_ext::BufReadExt;
@@ -163,6 +166,9 @@ pub fn read_multipart<S: Read>(stream: &mut S, always_use_files: bool) -> Result
         Ok(httparse::Status::Complete((_, raw_headers))) => {
             let mut headers = HeaderMap::new();
             for header in raw_headers {
+                if header.value.is_empty() {
+                    break;
+                }
                 let trim = header
                     .value
                     .iter()
@@ -282,6 +288,9 @@ fn inner<R: BufRead>(
                 Ok(httparse::Status::Complete((_, raw_headers))) => {
                     let mut headers = HeaderMap::new();
                     for header in raw_headers {
+                        if header.value.is_empty() {
+                            break;
+                        }
                         let trim = header
                             .value
                             .iter()
@@ -408,12 +417,16 @@ fn get_content_disposition_filename(cd: &HeaderValue) -> Result<Option<String>, 
             true => match value.find("filename=") {
                 Some(index) => {
                     let start = index + "filename=".len();
-                    Ok(Some(value.get(start..).unwrap().to_owned()))
+                    Ok(Some(
+                        value.get(start..).unwrap().trim_matches('\"').to_owned(),
+                    ))
                 }
                 None => match value.find("filename*=UTF-8''") {
                     Some(index) => {
                         let start = index + "filename*=UTF-8''".len();
-                        Ok(Some(value.get(start..).unwrap().to_owned()))
+                        Ok(Some(
+                            value.get(start..).unwrap().trim_matches('\"').to_owned(),
+                        ))
                     }
                     None => Ok(None),
                 },

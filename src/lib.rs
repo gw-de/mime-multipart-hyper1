@@ -1,4 +1,4 @@
-// Copyright 2016-2020 mime-multipart Developers
+// Copyright 2016-2025 mime-multipart Developers
 //
 // Licensed under the Apache License, Version 2.0, <LICENSE-APACHE or
 // http://apache.org/licenses/LICENSE-2.0> or the MIT license <LICENSE-MIT or
@@ -69,7 +69,7 @@ impl FilePart {
     }
 
     /// If you do not want the file on disk to be deleted when Self drops, call this
-    /// function.  It will become your responsability to clean up.
+    /// function.  It will become your responsibility to clean up.
     pub fn do_not_delete_on_drop(&mut self) {
         self.tempdir = None;
     }
@@ -148,7 +148,6 @@ pub enum Node {
 /// use `read_multipart_body()` instead.
 pub fn read_multipart<S: Read>(stream: &mut S, always_use_files: bool) -> Result<Vec<Node>, Error> {
     let mut reader = BufReader::with_capacity(4096, stream);
-    let mut nodes: Vec<Node> = Vec::new();
 
     let mut buf: Vec<u8> = Vec::new();
 
@@ -195,8 +194,7 @@ pub fn read_multipart<S: Read>(stream: &mut S, always_use_files: bool) -> Result
         Err(err) => Err(From::from(err)),
     }?;
 
-    inner(&mut reader, &headers, &mut nodes, always_use_files)?;
-    Ok(nodes)
+    inner(&mut reader, &headers, always_use_files)
 }
 
 /// Parse a MIME `multipart/*` from a `Read`able stream into a `Vec` of `Node`s, streaming
@@ -215,17 +213,15 @@ pub fn read_multipart_body<S: Read>(
     always_use_files: bool,
 ) -> Result<Vec<Node>, Error> {
     let mut reader = BufReader::with_capacity(4096, stream);
-    let mut nodes: Vec<Node> = Vec::new();
-    inner(&mut reader, headers, &mut nodes, always_use_files)?;
-    Ok(nodes)
+    inner(&mut reader, headers, always_use_files)
 }
 
 fn inner<R: BufRead>(
     reader: &mut R,
     headers: &HeaderMap,
-    nodes: &mut Vec<Node>,
     always_use_files: bool,
-) -> Result<(), Error> {
+) -> Result<Vec<Node>, Error> {
+    let mut nodes: Vec<Node> = Vec::new();
     let mut buf: Vec<u8> = Vec::new();
 
     let boundary = get_multipart_boundary(headers)?;
@@ -261,7 +257,7 @@ fn inner<R: BufRead>(
         {
             let peeker = reader.fill_buf()?;
             if peeker.len() >= 2 && &peeker[..2] == b"--" {
-                return Ok(());
+                return Ok(nodes);
             }
         }
 
@@ -333,8 +329,7 @@ fn inner<R: BufRead>(
         };
         if nested {
             // Recurse:
-            let mut inner_nodes: Vec<Node> = Vec::new();
-            inner(reader, &part_headers, &mut inner_nodes, always_use_files)?;
+            let inner_nodes = inner(reader, &part_headers, always_use_files)?;
             nodes.push(Node::Multipart((part_headers, inner_nodes)));
             continue;
         }

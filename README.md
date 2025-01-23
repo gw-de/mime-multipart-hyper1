@@ -1,13 +1,13 @@
-# mime-multipart
+# mime-multipart-hyper1
 
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE-MIT)
 [![Apache-2.0 licensed](https://img.shields.io/badge/license-APACHE2-blue.svg)](./LICENSE-APACHE)
 
-Rust library for MIME multipart parsing, construction, and streaming
+Rust library for MIME multipart parsing, construction, and streaming compatible with hyper v1.x
 
 This is a fork of https://github.com/mikedilger/mime-multipart with support for newer hyper versions.
 
-Documentation is available at https://docs.rs/mime-multipart
+Documentation is available at https://docs.rs/mime-multipart-hyper1
 
 ## Compatibility
 
